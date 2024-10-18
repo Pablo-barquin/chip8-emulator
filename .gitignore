@@ -1,0 +1,11 @@
+# VScode generated files
+.vscode
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+# Build output
+/build/
