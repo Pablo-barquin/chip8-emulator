@@ -13,7 +13,7 @@ public:
     // Inicialización de componentes
     void initialize_CPU();
     void initialize_Memory();
-    void initialize_Display();
+    void initialize_Display();  // Sirve para reiniciar la pantalla
     void initialize_Input();
 
     // Emulacion & Ciclos
