@@ -4,7 +4,7 @@
 class Display
 {
 public:
-    Display();
+    Display() {}
     void clear();
     void drawSprite(int x, int y, unsigned char sprite);
 

@@ -4,7 +4,7 @@
 class Input
 {
 public:
-    Input();
+    Input() {}
     void reset();
     bool isKeyPressed(unsigned char key);
     void pressKey(unsigned char key);

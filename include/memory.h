@@ -5,7 +5,7 @@
 
 class Memory {
 public:
-    Memory();
+    Memory() {}
     void initialize();
     unsigned char readMemory(unsigned short address);
     void writeMemory(unsigned short address, unsigned char value);

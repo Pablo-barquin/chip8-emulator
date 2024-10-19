@@ -1,10 +1,5 @@
 #include "input.h"
 
-Input::Input()
-{
-    reset();
-}
-
 void Input::reset()
 {
     // Inicializamos estado de las teclas

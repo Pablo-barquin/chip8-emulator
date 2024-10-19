@@ -1,10 +1,5 @@
 #include "display.h"
 
-Display::Display()
-{
-    clear();
-}
-
 void Display::clear()
 {
     // Limpiamos la pantalla

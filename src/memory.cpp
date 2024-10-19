@@ -1,10 +1,5 @@
 #include "memory.h"
 
-Memory::Memory()
-{
-    initialize();
-}
-
 void Memory::initialize()
 {
     // Limpiamos la memoria
