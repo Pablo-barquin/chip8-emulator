@@ -1,20 +1,25 @@
 cmake_minimum_required(VERSION 3.10)
+project(CHIP8_Emulator)
 
-# Nombre del proyecto
-project(chip8-emulator)
+# Configuración de C++ estándar
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Establecer el estándar de C++ (C++11, C++14, C++17, etc.)
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-# Agregar el directorio de encabezados (include/) al path de búsqueda
+# Incluye directorios de encabezados
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-# Recoge automáticamente todos los archivos fuente de src/
-file(GLOB SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
+# Archivos fuente
+file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
-# Añade el archivo main.cpp como fuente
-list(APPEND SOURCES "${CMAKE_SOURCE_DIR}/main.cpp")
+# Especificar la ruta de SDL2
+set(SDL2_PATH "C:/SDL2")
 
-# Crear el ejecutable a partir de los archivos fuente
-add_executable(chip8 ${SOURCES})
+# Agregar la carpeta 'include' al compilador
+include_directories(${SDL2_PATH}/include/SDL2)
+link_directories(${SDL2_PATH}/lib)
+
+# Crear el ejecutable
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+# Vincular bibliotecas de SDL2
+target_link_libraries(${PROJECT_NAME} SDL2 SDL2main)
