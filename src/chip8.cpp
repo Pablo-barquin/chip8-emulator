@@ -49,7 +49,8 @@ void Chip8::initialize_Input()
 
 void Chip8::run()
 {
-    while (true)
+    running = true;
+    while (running)
     {
         executeOpcode(); // Ejecutar un ciclo de la CPU
         updateTimers();  // Actualizar temporizadores
@@ -205,6 +206,7 @@ void Chip8::executeOpcode()
 
         default:
             std::cout << "Unknown opcode: " << opcode << std::endl;
+            running = false;
         }
         program_counter += 2;
         break;
@@ -274,6 +276,19 @@ void Chip8::executeOpcode()
 
         // Se espera a que se pulse una tecla y se asigne a VX
         case 0x000A:
+            bool key_pressed = false;
+            for (size_t i = 0; i < 16; ++i)
+            {
+                if (keys[i] != 0)
+                {
+                    V[vx] = i;
+                    program_counter += 2;
+                    key_pressed = true;
+                    break;
+                }
+            }
+            if (!key_pressed)
+                return; // No avanzamos el PC ni salimos del ciclo hasta que se presione una tecla
             break;
 
         // Se asigna a delay_timer el valor de VX
@@ -331,6 +346,7 @@ void Chip8::executeOpcode()
 
     default:
         std::cout << "Unknown opcode: " << opcode << std::endl;
+        running = false;
     }
 }
 

@@ -47,6 +47,9 @@ private:
 
     // Input
     unsigned char keys[16]; // Teclado hexadecimal
+
+    // Manejo de errores
+    bool running;
 };
 
 #endif
