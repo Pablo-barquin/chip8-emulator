@@ -1,14 +1,18 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
+
 #include "fontset.h"
 #include "iostream"
 
 class Chip8
 {
 public:
-    // Constructor
+    // Constructor y destructor
     Chip8();
+    ~Chip8();
 
     // Inicialización de componentes
     void initialize_CPU();
@@ -20,6 +24,8 @@ public:
     void run();
     void executeOpcode();
     void updateTimers();
+    void render();
+    void handleInput(const SDL_Event &event);
 
     // Dibujado en pantalla
     void drawSprite(unsigned short x, unsigned short y, unsigned short N);
@@ -50,6 +56,10 @@ private:
 
     // Manejo de errores
     bool running;
+
+    // SDL
+    SDL_Window* window = nullptr;
+    SDL_Renderer* renderer = nullptr;
 };
 
 #endif
