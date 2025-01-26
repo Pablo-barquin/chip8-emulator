@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(CHIP8_Emulator)
 
 # Configuración de C++ estándar
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Incluye directorios de encabezados
