@@ -103,10 +103,6 @@ Las teclas del teclado se mapean a las teclas originales del CHIP-8 de la siguie
 
 4. Envía un pull request.
 
-## Licencia ⚖️
-
-Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más información. 📝
-
 ## Recursos Adicionales 🌐
 
 - [Documentación de CHIP-8](https://en.wikipedia.org/wiki/CHIP-8)
