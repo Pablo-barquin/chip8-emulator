@@ -2,10 +2,10 @@
 #define CHIP8_H
 
 #define SDL_MAIN_HANDLED
-#include <SDL.h>
+#include "SDL.h"
 
-#include "fontset.h"
-#include "iostream"
+#include <fontset.h>
+#include <iostream>
 
 class Chip8
 {

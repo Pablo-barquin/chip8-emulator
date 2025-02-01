@@ -91,7 +91,7 @@ void Chip8::initialize_Input()
 
 void Chip8::run()
 {
-    bool running = true;
+    running = true;
     SDL_Event event;
 
     while (running)
@@ -153,9 +153,6 @@ void Chip8::executeOpcode()
 
     unsigned short vx;
     unsigned short vy;
-    unsigned char random_number;
-
-    bool key_pressed = false; //Instrucción Fx0A
 
     // Decode opcode
     switch (opcode & 0xF000)
@@ -234,56 +231,77 @@ void Chip8::executeOpcode()
         // Asignar valor de (VX or VY) a VX
         case 0x0001:
             V[vx] |= V[vy];
+            V[0xF] = 0; // VF se pone a 0
             break;
 
         // Asignar valor de (VX and VY) a VX
         case 0x0002:
             V[vx] &= V[vy];
+            V[0xF] = 0; // VF se pone a 0
             break;
 
         // Asignar valor de (VX xor VY) a VX
         case 0x0003:
             V[vx] ^= V[vy];
+            V[0xF] = 0; // VF se pone a 0
             break;
 
         // Suma VY a VX, con acarreo
         case 0x0004:
         {
             unsigned short sum = V[vx] + V[vy];
-            V[0xF] = (sum > 0xFF) ? 1 : 0;
             V[vx] = sum & 0xFF;
+            V[0xF] = (sum > 0xFF) ? 1 : 0;
             break;
         }
 
         // Resta VY a VX, con acarreo
         case 0x0005:
-            if (V[vx] > V[vy])
-                V[0xF] = 1;
-            else
-                V[0xF] = 0;
-            V[vx] -= V[vy];
-            break;
+        {
+            // Determinar el carry flag antes de modificar VX
+            uint8_t carry = (V[vx] >= V[vy]) ? 1 : 0;
 
-        // Desplazamiento a derecha de 1 a VX
-        case 0x0006:
-            V[0xF] = V[vx] & 0x1;
-            V[vx] >>= 1;
+            // Realizar la resta
+            V[vx] -= V[vy];
+
+            // Asignar acarreo a VF
+            V[0xF] = carry;
             break;
+        }
+        
+        // Desplazamiento a derecha de 1 a VX (original CHIP-8)
+        case 0x0006:
+        {
+            V[vx] = V[vy];
+            uint8_t carry = V[vx] & 0x1; // Guardar el bit menos significativo en VF
+            V[vx] >>= 1;
+            V[0xF] = carry;
+            break;
+        }
 
         // Resta VX a VY, con acarreo
         case 0x0007:
-            if (V[vy] > V[vx])
-                V[0xF] = 1;
-            else
-                V[0xF] = 0;
-            V[vx] = V[vy] - V[vx];
-            break;
+        {
+            // Determinar el carry flag antes de modificar VX
+            uint8_t carry = (V[vy] >= V[vx]) ? 1 : 0;
 
-        // Desplazamiento a izquierda de 1 a VX
-        case 0x000E:
-            V[0xF] = (V[vx] & 0x80) >> 7;
-            V[vx] <<= 1;
+            // Realizar la resta inversa
+            V[vx] = V[vy] - V[vx];
+
+            // Asignar acarreo a VF
+            V[0xF] = carry;
             break;
+        }
+        
+        // Desplazamiento a izquierda de 1 a VX (original CHIP-8)
+        case 0x000E:
+        {
+            V[vx] = V[vy];
+            uint8_t carry = (V[vx] & 0x80) >> 7; // Guardar el bit más significativo en VF
+            V[vx] <<= 1;
+            V[0xF] = carry;
+            break;
+        }
 
         default:
             std::cout << "Unknown opcode: " << opcode << std::endl;
@@ -311,10 +329,12 @@ void Chip8::executeOpcode()
 
     // Generar un número aleatorio entre 0 y 255, AND con NN, y almacenar en VX
     case 0xC000:
+    {
         vx = (opcode & 0x0F00) >> 8;
-        random_number = dis(gen);
+        unsigned char random_number = dis(gen); // Generar número aleatorio
         V[vx] = random_number & (opcode & 0x00FF);
         break;
+    }
 
     // Dibuja un sprite en la coordenada (VX, VY) de 8 pixeles de ancho y N pixeles de alto
     case 0xD000:
@@ -351,7 +371,8 @@ void Chip8::executeOpcode()
 
         // Se espera a que se pulse una tecla y se asigne a VX
         case 0x000A:
-            key_pressed = false;
+        {
+            bool key_pressed = false;
             for (size_t i = 0; i < 16; ++i)
             {
                 if (keys[i] != 0)
@@ -364,6 +385,7 @@ void Chip8::executeOpcode()
             if (!key_pressed)
                 program_counter -= 2; // No avanzamos el PC hasta que se presione una tecla
             break;
+        }
 
         // Se asigna a delay_timer el valor de VX
         case 0x0015:
@@ -397,16 +419,18 @@ void Chip8::executeOpcode()
             break;
         }
 
-        // Almacena desde V0 a VX en memoria, desde la dirección I. (I no se modifica)
+        // Almacena desde V0 a VX en memoria, desde la dirección I. (I se modifica, siguiendo los CHIP8 originales)
         case 0x0055:
             for (size_t reg = 0; reg <= vx; reg++)
                 memory[I + reg] = V[reg];
+                I += vx + 1;
             break;
 
-        // Carga desde V0 a VX con valores de la memoria, empezando desde I. (I no se modifica)
+        // Carga desde V0 a VX con valores de la memoria, empezando desde I. (I se modifica, siguiendo los CHIP8 originales)
         case 0x0065:
             for (size_t reg = 0; reg <= vx; reg++)
                 V[reg] = memory[I + reg];
+                I += vx + 1;
             break;
         }
         break;
@@ -455,21 +479,28 @@ void Chip8::render()
 
 void Chip8::drawSprite(unsigned short x, unsigned short y, unsigned short N)
 {
+    V[0xF] = 0; // Reinicia el flag de colisión
+
+    if (x > 63) x %= 64; // Wrapping 
+    if (y > 31) y %= 32; // Wrapping
+
     for (size_t yline = 0; yline < N; yline++)
     {
-        unsigned char data = memory[I + yline]; // Acceso a los bytes que se quieren pintar
+        unsigned short posY = y + yline;
+        if (posY >= 32) break; // Clipping
+
+        unsigned char data = memory[I + yline]; // Obtener la línea del sprite
         for (size_t xpix = 0; xpix < 8; xpix++)
         {
-            if ((data & (0x80 >> xpix)) != 0)
+            unsigned short posX = x + xpix;
+            if (posX >= 64) break; // Clipping
+
+            if ((data & (0x80 >> xpix)) != 0) // Si el bit actual es 1
             {
-                // Calcular la posición en pantalla, con envolvimiento (modular)
-                unsigned short posX = (x + xpix) % 64;
-                unsigned short posY = (y + yline) % 32;
-
                 if (screen[posX + (posY * 64)] == 1)
-                    V[0xF] = 1; // Existe una colision
+                    V[0xF] = 1; // Colisión detectada
 
-                screen[posX + (posY * 64)] ^= 1; // Nota: Las coordenadas son las que ofrece el opcode
+                screen[posX + (posY * 64)] ^= 1; // Alternar pixel
                 std::cout << "Pixel modificado: PosX=" << posX << ", PosY=" << posY << ", Estado=" << (int)screen[posX + (posY * 64)] << std::endl;
             }
         }
