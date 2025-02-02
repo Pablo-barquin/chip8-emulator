@@ -28,31 +28,31 @@ public:
     void handleInput(const SDL_Event &event);
 
     // Dibujado en pantalla
-    void drawSprite(unsigned short x, unsigned short y, unsigned short N);
+    void drawSprite(uint8_t x, uint8_t y, uint8_t N);
 
     // Carga de Juego
     void loadGame(const char *filename);
 
 private:
     // CPU
-    unsigned char V[16];            // Registros V0 a VF
-    unsigned short I;               // Registro I
-    unsigned short program_counter; // Contador de programa
-    unsigned short stack[16];       // Pila
-    unsigned short stack_ptr;       // Puntero de pila
-    unsigned short opcode;          // Instrucción actual
-    unsigned char delay_timer;      // Temporizador de retraso
-    unsigned char sound_timer;      // Temporizador de sonido
+    uint8_t V[16];            // Registros V0 a VF
+    uint16_t I;               // Registro I
+    uint16_t program_counter; // Contador de programa
+    uint16_t stack[16];       // Pila
+    uint16_t stack_ptr;       // Puntero de pila
+    uint16_t opcode;          // Instrucción actual
+    uint8_t delay_timer;      // Temporizador de retraso
+    uint8_t sound_timer;      // Temporizador de sonido
 
     // Memoria
     void loadFontset();
-    unsigned char memory[4096]; // Memoria de 4KB
+    uint8_t memory[4096]; // Memoria de 4KB
 
     // Display
-    unsigned char screen[64 * 32]; // Pantalla de 64x32
+    uint8_t screen[64 * 32]; // Pantalla de 64x32
 
     // Input
-    unsigned char keys[16]; // Teclado hexadecimal
+    uint8_t keys[16]; // Teclado hexadecimal
 
     // Manejo de errores
     bool running;

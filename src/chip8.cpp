@@ -151,8 +151,8 @@ void Chip8::executeOpcode()
 
     program_counter += 2; // Incrementar el contador de programa antes de ejecutar la instrucción
 
-    unsigned short vx;
-    unsigned short vy;
+    uint8_t vx;
+    uint8_t vy;
 
     // Decode opcode
     switch (opcode & 0xF000)
@@ -249,7 +249,7 @@ void Chip8::executeOpcode()
         // Suma VY a VX, con acarreo
         case 0x0004:
         {
-            unsigned short sum = V[vx] + V[vy];
+            uint16_t sum = V[vx] + V[vy];
             V[vx] = sum & 0xFF;
             V[0xF] = (sum > 0xFF) ? 1 : 0;
             break;
@@ -331,7 +331,7 @@ void Chip8::executeOpcode()
     case 0xC000:
     {
         vx = (opcode & 0x0F00) >> 8;
-        unsigned char random_number = dis(gen); // Generar número aleatorio
+        uint8_t random_number = dis(gen); // Generar número aleatorio
         V[vx] = random_number & (opcode & 0x00FF);
         break;
     }
@@ -410,7 +410,7 @@ void Chip8::executeOpcode()
         // Almacena la representación BCD de VX en memoria
         case 0x0033:
         {
-            unsigned char value = V[vx];
+            uint8_t value = V[vx];
 
             // Calcular y almacenar los dígitos BCD
             memory[I] = value / 100;           // Centena
@@ -477,7 +477,7 @@ void Chip8::render()
 }
 
 
-void Chip8::drawSprite(unsigned short x, unsigned short y, unsigned short N)
+void Chip8::drawSprite(uint8_t x, uint8_t y, uint8_t N)
 {
     V[0xF] = 0; // Reinicia el flag de colisión
 
@@ -486,13 +486,13 @@ void Chip8::drawSprite(unsigned short x, unsigned short y, unsigned short N)
 
     for (size_t yline = 0; yline < N; yline++)
     {
-        unsigned short posY = y + yline;
+        uint8_t posY = y + yline;
         if (posY >= 32) break; // Clipping
 
-        unsigned char data = memory[I + yline]; // Obtener la línea del sprite
+        uint8_t data = memory[I + yline]; // Obtener la línea del sprite
         for (size_t xpix = 0; xpix < 8; xpix++)
         {
-            unsigned short posX = x + xpix;
+            uint8_t posX = x + xpix;
             if (posX >= 64) break; // Clipping
 
             if ((data & (0x80 >> xpix)) != 0) // Si el bit actual es 1
