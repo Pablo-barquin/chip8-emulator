@@ -12,28 +12,24 @@ Chip8::Chip8()
 {
     // Inicializar SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        std::cerr << "Error al inicializar SDL: " << SDL_GetError() << std::endl;
-        exit(1);
-    }
+        throw std::runtime_error("Error al inicializar SDL: " + std::string(SDL_GetError()));
+    
 
     // Crear la ventana
     window = SDL_CreateWindow("CHIP-8 Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 320, SDL_WINDOW_SHOWN);
     if (window == nullptr)
     {
-        std::cerr << "Error al crear la ventana: " << SDL_GetError() << std::endl;
         SDL_Quit();
-        exit(1);
+        throw std::runtime_error("Error al crear la ventana: " + std::string(SDL_GetError()));
     }
 
     // Crear el renderizador
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == nullptr)
     {
-        std::cerr << "Error al crear el renderizador: " << SDL_GetError() << std::endl;
         SDL_DestroyWindow(window);
         SDL_Quit();
-        exit(1);
+        throw std::runtime_error("Error al crear el renderizador: " + std::string(SDL_GetError()));
     }
 
     initialize_CPU();
@@ -159,10 +155,9 @@ void Chip8::executeOpcode()
 
     program_counter += 2; // Incrementar el contador de programa antes de ejecutar la instrucción
 
-    uint8_t vx;
-    uint8_t vy;
-
-    // Decode opcode
+    // 2. Decode & Execute: Decodificar y ejecutar el opcode
+    uint8_t vx = (opcode & 0x0F00) >> 8;    // Registro VX
+    uint8_t vy = (opcode & 0x00F0) >> 4;    // Registro VY
     switch (opcode & 0xF000)
     {
     case 0x0000:
@@ -193,41 +188,33 @@ void Chip8::executeOpcode()
 
     // Salta la siguiente instrucción si VX == NN
     case 0x3000:
-        vx = (opcode & 0x0F00) >> 8;
         if (V[vx] == (opcode & 0x00FF))
             program_counter += 2;
         break;
         
     // Salta la siguiente instrucción si VX != NN
     case 0x4000:
-        vx = (opcode & 0x0F00) >> 8;
         if (V[vx] != (opcode & 0x00FF))
             program_counter += 2;
         break;
 
     // Salta la siguiente instrucción si VX == VY
     case 0x5000:
-        vx = (opcode & 0x0F00) >> 8;
-        vy = (opcode & 0x00F0) >> 4;
         if (V[vx] == V[vy])
             program_counter += 2;
         break;
 
     // Asignar valor NN a VX
     case 0x6000:
-        vx = (opcode & 0x0F00) >> 8;
         V[vx] = (opcode & 0x00FF);
         break;
 
     // Incrementar valor NN en VX
     case 0x7000:
-        vx = (opcode & 0x0F00) >> 8;
         V[vx] += (opcode & 0x00FF);
         break;
 
     case 0x8000:
-        vx = (opcode & 0x0F00) >> 8;
-        vy = (opcode & 0x00F0) >> 4;
         switch (opcode & 0x000F)
         {
         // Asignar valor de VY a VX
@@ -318,8 +305,6 @@ void Chip8::executeOpcode()
 
     // Salta a la siguiente instrucción si VX != VY
     case 0x9000:
-        vx = (opcode & 0x0F00) >> 8;
-        vy = (opcode & 0x00F0) >> 4;
         if (V[vx] != V[vy])
             program_counter += 2;
         break;
@@ -337,7 +322,6 @@ void Chip8::executeOpcode()
     // Generar un número aleatorio entre 0 y 255, AND con NN, y almacenar en VX
     case 0xC000:
     {
-        vx = (opcode & 0x0F00) >> 8;
         uint8_t random_number = dis(gen); // Generar número aleatorio
         V[vx] = random_number & (opcode & 0x00FF);
         break;
@@ -345,15 +329,12 @@ void Chip8::executeOpcode()
 
     // Dibuja un sprite en la coordenada (VX, VY) de 8 pixeles de ancho y N pixeles de alto
     case 0xD000:
-        vx = (opcode & 0x0F00) >> 8;
-        vy = (opcode & 0x00F0) >> 4;
         drawSprite(V[vx], V[vy], (opcode & 0x000F));
 
         display_wait = true; // Esperar al siguiente frame antes de continuar
         break;
 
     case 0xE000:
-        vx = (opcode & 0x0F00) >> 8;
         // Salta a la siguiente instrucción si la tecla en VX es presionada
         if ((opcode & 0x00FF) == 0x009E)
         {
@@ -369,8 +350,6 @@ void Chip8::executeOpcode()
         break;
 
     case 0xF000:
-        vx = (opcode & 0x0F00) >> 8;
-
         switch (opcode & 0x00FF)
         {
         // Asigna a VX el valor del delay_timer
@@ -381,18 +360,31 @@ void Chip8::executeOpcode()
         // Se espera a que se pulse una tecla y se asigne a VX
         case 0x000A:
         {
-            bool key_pressed = false;
-            for (size_t i = 0; i < 16; ++i)
+            // Esperar a que se presione una tecla
+            static bool key_pressed = false;
+            static int8_t key = -1; // Flag para guardar la tecla presionada
+            for (size_t i = 0; key == -1 && i < sizeof(keys); ++i)
             {
-                if (keys[i] != 0)
+                if (keys[i] == 1) // Si alguna tecla está presionada
                 {
-                    V[vx] = i;
+                    key = i;                // Guardar la tecla presionada  
                     key_pressed = true;
                     break;
                 }
             }
             if (!key_pressed)
                 program_counter -= 2; // No avanzamos el PC hasta que se presione una tecla
+            else {
+                // Si la tecla sigue presionada, no avanzar el PC
+                if(keys[key] == 1)
+                    program_counter -= 2;
+                else 
+                {
+                    V[vx] = key;            // Si se suelta la tecla, guardar en VX
+                    key = -1;               // Reiniciar key para la siguiente tecla
+                    key_pressed = false;    // Reiniciar flag de tecla presionada
+                }
+            }
             break;
         }
 
