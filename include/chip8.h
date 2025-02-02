@@ -49,7 +49,11 @@ private:
     uint8_t memory[4096]; // Memoria de 4KB
 
     // Display
-    uint8_t screen[64 * 32]; // Pantalla de 64x32
+    uint8_t screen[64 * 32];                    // Pantalla de 64x32
+    bool display_wait = false;                  // Variables de control de la pantalla
+    const uint32_t instructionsPerFrame = 11;   // Ejecutar hasta 11 instrucciones por frame (Chip-8 Original)
+    const uint32_t frameDelay = 1000 / 60;      // 60 FPS (~16.67ms por frame)
+
 
     // Input
     uint8_t keys[16]; // Teclado hexadecimal

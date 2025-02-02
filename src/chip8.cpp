@@ -96,24 +96,33 @@ void Chip8::run()
 
     while (running)
     {
-        // Manejar eventos de SDL
+        uint32_t frameStart = SDL_GetTicks();
+
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
-            {
                 running = false;
-            }
             else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
-            {
                 handleInput(event);
-            }
         }
 
-        executeOpcode();
+        // Ejecutar instrucciones, pero detenerse si `display_wait` se activa
+        int executedInstructions = 0;
+        while (executedInstructions < instructionsPerFrame && !display_wait)
+        {
+            executeOpcode();
+            executedInstructions++;
+        }
+
         updateTimers();
         render();
 
-        SDL_Delay(2); // Retardo para limitar la velocidad de ejecución del emulador
+        display_wait = false; // Reiniciar el flag
+
+        // Si el frame se ejecutó muy rápido, esperar el tiempo restante
+        uint32_t frameTime = SDL_GetTicks() - frameStart;
+        if (frameTime < frameDelay) 
+            SDL_Delay(frameDelay - frameTime);
     }
 }
 
@@ -134,7 +143,6 @@ void Chip8::handleInput(const SDL_Event& event)
         keys[chip8Key] = (event.type == SDL_KEYDOWN) ? 1 : 0; // Actualiza el estado de la tecla
     }
 }
-
 
 void Chip8::loadFontset()
 {
@@ -168,7 +176,6 @@ void Chip8::executeOpcode()
         {
             --stack_ptr;
             program_counter = stack[stack_ptr];
-            stack[stack_ptr] = 0;
         }
         break;
 
@@ -341,6 +348,8 @@ void Chip8::executeOpcode()
         vx = (opcode & 0x0F00) >> 8;
         vy = (opcode & 0x00F0) >> 4;
         drawSprite(V[vx], V[vy], (opcode & 0x000F));
+
+        display_wait = true; // Esperar al siguiente frame antes de continuar
         break;
 
     case 0xE000:
