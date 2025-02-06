@@ -1,10 +1,17 @@
 # Emulador CHIP-8
-
-![CHIP-8 Emulator](https://img.shields.io/badge/C%2B%2B-11-blue.svg) ![SDL2](https://img.shields.io/badge/SDL2-2.0-brightgreen.svg) ![Status](https://img.shields.io/badge/Status-In%20Development-orange.svg)
+![CHIP-8 Emulator](https://img.shields.io/badge/C%2B%2B-11-blue.svg) ![SDL2](https://img.shields.io/badge/SDL2-2.0-orange.svg) ![Status](https://img.shields.io/badge/Status-Completed-brightgreen.svg)
 
 Este proyecto es un **emulador del sistema CHIP-8** desarrollado en C++ utilizando la biblioteca SDL2 en sistema operativo Windows. El CHIP-8 es una máquina virtual simple que se utilizaba para videojuegos en los años 70.
 
-La idea de este repositorio es aprender sobre la creación de emuladores básicos y explorar conceptos fundamentales como el uso de operaciones con bits, incluidos desplazamientos, manipulación de registros o optimización del uso de la memoria.
+<p align="center">
+  <img src="assets/demo.gif" alt="Demo del Emulador"/>
+</p>
+
+El objetivo de este proyecto es aprender cómo funcionan los emuladores básicos y explorar temas clave como operaciones con bits, desplazamientos, registros y optimización de memoria.
+
+Este emulador ha sido probado con los tests del repositorio de [Timendus](https://github.com/Timendus/chip8-test-suite), lo que ayudó a encontrar y corregir errores.
+
+(El temporizador de sonido está implementado, pero aún no tiene un efecto personalizado. Esto se considera una mejora futura.)
 
 ## Características 🌟
 
@@ -28,7 +35,7 @@ Antes de comenzar, asegúrate de tener lo siguiente instalado:
 1. Clona este repositorio:
 
    ```bash
-   git clone https://github.com/tuusuario/emulador-chip8.git
+   git clone https://github.com/Pablo-barquin/chip8-emulator.git
    cd emulador-chip8
    ```
 
@@ -55,24 +62,9 @@ CHIP8_Emulator.exe <ruta_a_la_rom>
 
 Las teclas del teclado se mapean a las teclas originales del CHIP-8 de la siguiente manera:
 
-| Tecla CHIP-8 | Tecla Física |
-|--------------|---------------|
-| 1 | 1 |
-| 2 | 2 |
-| 3 | 3 |
-| C | 4 |
-| 4 | Q |
-| 5 | W |
-| 6 | E |
-| D | R |
-| 7 | A |
-| 8 | S |
-| 9 | D |
-| E | F |
-| A | Z |
-| 0 | X |
-| B | C |
-| F | V |
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2cb26065-3631-4f52-ad96-8ec6e7bac0aa" alt="Mapping del teclado de Chip-8"/>
+</p>
 
 ## Estructura del Proyecto 🗂️
 
