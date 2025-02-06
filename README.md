@@ -71,8 +71,9 @@ Las teclas del teclado se mapean a las teclas originales del CHIP-8 de la siguie
 ```
 /
 |-- src/               # Archivos fuente principales
+|-- assets/            # Se encuentra el .gif de muestra
+|-- roms/              # Roms de ejemplo para probar el emulador
 |-- include/           # Archivos de cabecera
-|-- build/             # Directorio de construcción (ignorado por git)
 |-- CMakeLists.txt     # Archivo de configuración para CMake
 |-- .gitignore         # Evita la subida de ficheros innecesarios al repositorio
 |-- README.md          # Descripción del proyecto
